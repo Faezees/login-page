@@ -7,11 +7,11 @@ import { fetchBookings } from "../src/store/slices/bookingsSlice";
 
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { items, loading, error } = useAppSelector((s) => s.bookings);
   const auth = useAppSelector((s) => s.auth);
   const router = useRouter();
-  
 
   useEffect(() => {
     setMounted(true);
@@ -43,10 +43,14 @@ export default function Dashboard() {
 
   if (!mounted) return null;
 
-  return (
-    <div className="min-h-screen flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r p-6">
+  const logoutHandler = () => {
+    dispatch(logout());
+    router.push("/");
+  };
+
+  const SidebarContent = () => (
+    <div className="flex flex-col justify-between h-full">
+      <div>
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-indigo-600 rounded flex items-center justify-center text-white font-bold">
             {auth?.user?.name[0]}
@@ -63,25 +67,49 @@ export default function Dashboard() {
           <div className="px-3 py-2 rounded hover:bg-gray-100">Analytics</div>
           <div className="px-3 py-2 rounded hover:bg-gray-100">Settings</div>
         </nav>
+      </div>
 
-          <div className="mt-8 absolute bottom-6">
-          <button
-            onClick={() => {
-              dispatch(logout());
-              router.push("/");
-            }}
-            className="text-lg text-red-500"
-          >
-            Log out
-          </button>
-        </div>
+      <div className="flex flex-col gap-2">
+        <button onClick={logoutHandler} className="text-red-500 font-semibold">
+          Log out
+        </button>
+      </div>
+    </div>
+  );
 
-        <div className="mt-auto text-sm text-gray-700 absolute bottom-14">
-          <span className="text-sm text-gray-700">faeze1377.es@gmail.com</span>
-        </div>
+  return (
+    <div className="min-h-screen flex">
+      {/* دسکتاپ Sidebar */}
+      <aside className="hidden md:flex w-64 bg-white border-r p-6">
+        <SidebarContent />
       </aside>
 
-      <main className="flex-1 p-8">
+      {/* موبایل Drawer */}
+      <div className="md:hidden">
+        <button
+          className="p-2 m-2 rounded-md bg-gray-200"
+          onClick={() => setMobileOpen(true)}
+        >
+          &#9776; {/* آیکون سه خط */}
+        </button>
+
+        {mobileOpen && (
+          <div
+            className="fixed inset-0 bg-black/30 z-50"
+            onClick={() => setMobileOpen(false)}
+          >
+            <aside
+              className="absolute left-0 top-0 w-64 h-full bg-white p-6 flex flex-col justify-between"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <SidebarContent />
+            </aside>
+          </div>
+        )}
+      </div>
+
+      {/* Main Content */}
+      <main className="flex-1 p-6 md:p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">
@@ -94,7 +122,7 @@ export default function Dashboard() {
         </div>
 
         {/* Summary cards */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div className="bg-white p-6 rounded shadow">
             <div className="text-sm text-gray-500">Visitor this month</div>
             <div className="text-3xl font-bold mt-2">2,420</div>
@@ -129,14 +157,12 @@ export default function Dashboard() {
                 20
               </span>
             </h3>
-            <div>
-              <button
-                onClick={() => dispatch(fetchBookings(auth?.user?.role || ""))}
-                className="px-3 py-1 border rounded"
-              >
-                Refresh
-              </button>
-            </div>
+            <button
+              onClick={() => dispatch(fetchBookings(auth?.user?.role || ""))}
+              className="px-3 py-1 border rounded"
+            >
+              Refresh
+            </button>
           </div>
 
           {loading && (
@@ -191,3 +217,4 @@ export default function Dashboard() {
     </div>
   );
 }
+
