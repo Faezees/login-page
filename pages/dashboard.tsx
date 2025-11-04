@@ -64,22 +64,20 @@ export default function Dashboard() {
           <div className="px-3 py-2 rounded hover:bg-gray-100">Settings</div>
         </nav>
 
-        <div className="mt-8">
+          <div className="mt-8 absolute bottom-6">
           <button
             onClick={() => {
               dispatch(logout());
               router.push("/");
             }}
-            className="text-sm text-red-500"
+            className="text-lg text-red-500"
           >
             Log out
           </button>
         </div>
 
-        <div className="mt-auto text-sm text-gray-500">
-          Simo Oudib
-          <br />
-          <span className="text-xs text-gray-400">faeze1377.es@gmail.com</span>
+        <div className="mt-auto text-sm text-gray-700 absolute bottom-14">
+          <span className="text-sm text-gray-700">faeze1377.es@gmail.com</span>
         </div>
       </aside>
 
